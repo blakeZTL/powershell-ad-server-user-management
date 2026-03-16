@@ -54,7 +54,15 @@ function Write-SuccessLine {
 
 Show-AppHeader -Title "AD Server Management"
 
-$configPath = "$PSScriptRoot\Config\config.psd1"
+$scriptRoot =
+if ($PSScriptRoot) {
+    $PSScriptRoot
+}
+else {
+    [System.AppDomain]::CurrentDomain.BaseDirectory.TrimEnd('\')
+}
+
+$configPath = Join-Path $scriptRoot 'Config\config.psd1'
 $config = Import-PowerShellDataFile -Path $configPath
 
 Write-Section "Configuration"
@@ -80,7 +88,7 @@ $currentMembers = DirectoryTools\Get-GroupMemberDNs -GroupName $config.ActiveDir
 
 # Backup current members to CSV
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
-$logFolder = "$PSScriptRoot\logs"
+$logFolder = Join-Path $scriptRoot 'logs'
 if (-not (Test-Path $logFolder)) {
     New-Item -ItemType Directory -Path $logFolder -Force | Out-Null
 }
